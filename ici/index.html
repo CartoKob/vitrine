@@ -7,7 +7,7 @@
 <title>ICI. — par CartoKob</title>
 <meta name="description" content="Deux chemins, une rencontre. Créez la carte de l'endroit où tout a commencé.">
 <link rel="preconnect" href="https://unpkg.com">
-<link rel="preconnect" href="https://basemaps.cartocdn.com">
+<link rel="preconnect" href="https://tile.openstreetmap.org">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{
@@ -39,7 +39,8 @@ h1{font-size:clamp(54px,17vw,82px);line-height:.86;letter-spacing:-.06em;margin:
 .leaflet-control-attribution{font:9px Georgia,serif;background:rgba(255,255,255,.7)!important}
 .map-theme-epure .leaflet-tile{filter:grayscale(1) brightness(1.08) contrast(.92)}
 .map-theme-vintage .leaflet-tile{filter:sepia(.55) saturate(.72) brightness(1.02) contrast(.92)}
-.map-theme-night .leaflet-tile{filter:saturate(.6) brightness(.9)}
+.map-theme-night .leaflet-tile{filter:grayscale(.35) invert(.92) hue-rotate(175deg) saturate(.55) brightness(.58) contrast(1.08)}
+.map-theme-atlas .leaflet-tile{filter:saturate(.72) contrast(.96) brightness(1.02)}
 .result-meta{padding:16px 16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{border:1px solid var(--line);border-radius:15px;padding:12px;background:rgba(255,255,255,.24)}.metric span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.metric strong{font-size:21px}
 .poster-label{display:flex;justify-content:space-between;align-items:end;margin:24px 2px 10px}.poster-label strong{font-size:21px}.poster-label span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
 .poster{border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}.poster svg{width:100%;display:block}.poster-actions{padding:12px;display:grid;grid-template-columns:1fr;gap:8px}.secondary{width:100%;border:1px solid var(--ink);background:transparent;border-radius:999px;padding:14px;font-weight:700}.secondary.dark{background:var(--ink);color:#fff}.download-help{text-align:center;font-size:11px;color:var(--muted);padding:0 14px 14px}
@@ -217,11 +218,8 @@ async function fetchRoadContext(data){
   }catch{return []}
 }
 
-function tileUrl(kind){
-  const name=kind==="dark"?"dark_nolabels":kind==="voyager"?"rastertiles/voyager_nolabels":"light_nolabels";
-  return kind==="voyager"
-    ?"https://{s}.basemaps.cartocdn.com/"+name+"/{z}/{x}/{y}{r}.png"
-    :"https://{s}.basemaps.cartocdn.com/"+name+"/{z}/{x}/{y}{r}.png";
+function tileUrl(){
+  return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 }
 
 function ensureMap(){
@@ -232,10 +230,9 @@ function ensureMap(){
 function setBaseLayer(){
   ensureMap();
   if(baseLayer) map.removeLayer(baseLayer);
-  baseLayer=L.tileLayer(tileUrl(themes[currentTheme].tile),{
-    maxZoom:20,
-    subdomains:"abcd",
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CARTO'
+  baseLayer=L.tileLayer(tileUrl(),{
+    maxZoom:19,
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
   const el=$("#map");
   el.className="";
