@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4efe5">
+<title>ICI. — par CartoKob</title>
+<meta name="description" content="Deux chemins, une rencontre. Créez la carte de l'endroit où tout a commencé.">
+<style>
+:root{
+  --paper:#f4efe5;--ink:#171717;--muted:#6e6a63;--line:#d7d0c4;
+  --rust:#b45c45;--blue:#2e5f75;--sage:#6d7f70;--night:#121820;
+  --radius:22px;--shadow:0 12px 40px rgba(23,23,23,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,"Times New Roman",Times,serif}
+button,input{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.shell{max-width:760px;margin:auto;min-height:100vh;padding:0 18px 48px}
+.topbar{height:68px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:19px;font-weight:700;letter-spacing:-.02em}
+.brand small{font-weight:400;color:var(--muted)}
+.toplink{font-size:14px;border-bottom:1px solid var(--ink)}
+.hero{padding:28px 0 22px}
+.kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+h1{font-size:clamp(48px,16vw,78px);line-height:.88;letter-spacing:-.055em;margin:0 0 18px;font-weight:700}
+.hero p{font-size:21px;line-height:1.28;max-width:540px;margin:0 0 22px}
+.cta{width:100%;border:0;border-radius:999px;background:var(--ink);color:#fff;padding:17px 22px;font-weight:700;font-size:17px}
+.micro{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 0}
+.map-card{margin:28px 0 10px;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:#faf7f0;box-shadow:var(--shadow)}
+.map-stage{position:relative;aspect-ratio:4/5;min-height:430px;overflow:hidden}
+.map-stage svg{width:100%;height:100%;display:block}
+.map-caption{position:absolute;inset:auto 18px 18px 18px;background:rgba(244,239,229,.92);backdrop-filter:blur(8px);border:1px solid rgba(23,23,23,.08);border-radius:18px;padding:14px 15px}
+.map-caption strong{font-size:18px}
+.map-caption div{font-size:13px;color:var(--muted);margin-top:4px}
+.section{padding:48px 0 0}
+.section h2{font-size:38px;line-height:.95;letter-spacing:-.035em;margin:0 0 12px}
+.lead{font-size:17px;line-height:1.45;color:#393632;margin:0 0 24px}
+.steps{display:grid;gap:12px}
+.field{border:1px solid var(--line);border-radius:18px;padding:13px 14px;background:rgba(255,255,255,.25)}
+.field label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field input{width:100%;border:0;outline:0;background:transparent;font-size:18px;color:var(--ink)}
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.style-btn{min-height:108px;text-align:left;border:1px solid var(--line);border-radius:18px;padding:14px;background:transparent;position:relative}
+.style-btn.active{border:2px solid var(--ink);padding:13px}
+.style-btn strong{display:block;font-size:18px;margin-bottom:4px}
+.style-btn span{font-size:12px;color:var(--muted)}
+.swatches{display:flex;gap:7px;margin-top:14px}
+.swatches i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
+.color-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.colorbox{border:1px solid var(--line);border-radius:18px;padding:12px}
+.colorbox label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.colorbox input{width:100%;height:38px;border:0;background:none;padding:0;margin-top:4px}
+.products{display:grid;gap:12px}
+.product{border:1px solid var(--line);border-radius:22px;padding:20px;background:rgba(255,255,255,.24)}
+.product.featured{background:var(--ink);color:#fff;border-color:var(--ink)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;border-radius:999px;padding:5px 8px;margin-bottom:14px;opacity:.8}
+.product h3{font-size:27px;margin:0 0 4px;letter-spacing:-.025em}
+.price{font-size:36px;font-weight:700;letter-spacing:-.04em;margin:8px 0}
+.product p{margin:0 0 16px;line-height:1.42;color:var(--muted)}
+.product.featured p{color:#d6d2ca}
+.product ul{margin:0;padding-left:18px;line-height:1.55;font-size:14px}
+.choose{margin-top:16px;width:100%;padding:14px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font-weight:700}
+.featured .choose{background:#fff;color:var(--ink);border-color:#fff}
+.pay{margin-top:20px;border-top:1px solid var(--line);padding-top:18px}
+.pay button{width:100%;height:52px;border:0;border-radius:13px;background:#000;color:white;font:600 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.pay .gpay{margin-top:9px;background:#fff;color:#111;border:1px solid #bbb}
+.note{font-size:12px;color:var(--muted);line-height:1.4;margin-top:10px}
+.footer{padding:56px 0 8px;font-size:13px;color:var(--muted)}
+.routeA,.routeB,.explore{stroke-linecap:round;stroke-linejoin:round;fill:none}
+.explore{stroke-width:1.4;opacity:.20}
+.routeA,.routeB{stroke-width:4;stroke-dasharray:900;stroke-dashoffset:900;animation:draw 3s ease forwards}
+.routeB{animation-delay:.45s}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media(min-width:680px){
+ .style-grid{grid-template-columns:repeat(4,1fr)}
+ .products{grid-template-columns:repeat(3,1fr)}
+ .product{display:flex;flex-direction:column}.choose{margin-top:auto}
+ .map-stage{aspect-ratio:16/10;min-height:480px}
+}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="topbar">
+    <div class="brand">ICI. <small>par CartoKob</small></div>
+    <a class="toplink" href="#offres">Les offres</a>
+  </header>
+
+  <section class="hero">
+    <div class="kicker">Une histoire · une carte</div>
+    <h1>Deux chemins.<br>Une rencontre.</h1>
+    <p>Transformez l’endroit où tout a commencé en carte personnalisée et en animation cartographique.</p>
+    <a href="#creer"><button class="cta">Créer notre carte</button></a>
+    <div class="micro">4 styles · aperçu immédiat · pensé pour le téléphone</div>
+  </section>
+
+  <section class="map-card" aria-label="aperçu cartographique">
+    <div class="map-stage">
+      <svg viewBox="0 0 420 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Deux itinéraires convergent vers un lieu de rencontre">
+        <rect width="420" height="520" fill="#f8f4eb"/>
+        <g id="roads" stroke="#c9c1b5" fill="none">
+          <path d="M-20 55 L440 138" class="explore"/><path d="M-30 112 L450 195" class="explore"/>
+          <path d="M-10 186 L430 266" class="explore"/><path d="M-30 274 L450 345" class="explore"/>
+          <path d="M-20 390 L440 455" class="explore"/><path d="M44 -20 L132 540" class="explore"/>
+          <path d="M123 -10 L178 530" class="explore"/><path d="M236 -20 L214 540" class="explore"/>
+          <path d="M332 -10 L270 540" class="explore"/><path d="M430 38 L-20 420" class="explore"/>
+          <path d="M-30 470 L440 82" class="explore"/><path d="M35 0 Q180 180 404 225" class="explore"/>
+          <path d="M0 340 Q190 240 420 402" class="explore"/>
+        </g>
+        <path id="routeA" d="M55 82 L92 111 L118 170 L151 214 L176 278 L210 344 L219 398" class="routeA" stroke="#b45c45"/>
+        <path id="routeB" d="M365 90 L330 122 L301 178 L274 215 L257 286 L234 342 L219 398" class="routeB" stroke="#2e5f75"/>
+        <circle cx="55" cy="82" r="7" fill="#b45c45"/><circle cx="365" cy="90" r="7" fill="#2e5f75"/>
+        <circle cx="219" cy="398" r="12" fill="#f8f4eb" stroke="#171717" stroke-width="3"/>
+        <text x="34" y="61" font-family="Georgia,serif" font-size="14" fill="#171717">Camille</text>
+        <text x="334" y="69" font-family="Georgia,serif" font-size="14" fill="#171717">Alex</text>
+        <text x="219" y="431" text-anchor="middle" font-family="Georgia,serif" font-size="15" fill="#171717">ICI. Notre rencontre</text>
+      </svg>
+      <div class="map-caption">
+        <strong>La carte raconte votre histoire.</strong>
+        <div>Les rues s’explorent, les itinéraires apparaissent, les chemins se rejoignent.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="creer">
+    <div class="kicker">01 · Vos lieux</div>
+    <h2>Racontez-nous où.</h2>
+    <p class="lead">Trois lieux suffisent. La précision peut aller d’une ville à une adresse.</p>
+    <div class="steps">
+      <div class="field"><label>J’habitais ici</label><input placeholder="Ville, quartier ou adresse"></div>
+      <div class="field"><label>L’autre habitait ici</label><input placeholder="Ville, quartier ou adresse"></div>
+      <div class="field"><label>On s’est rencontrés ici</label><input placeholder="Restaurant, parc, adresse…"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="kicker">02 · Le style</div>
+    <h2>Votre carte, votre ambiance.</h2>
+    <p class="lead">Même histoire, quatre écritures cartographiques.</p>
+    <div class="style-grid">
+      <button class="style-btn active" data-style="epure"><strong>Épure</strong><span>Minimal, ivoire, intemporel.</span><div class="swatches"><i style="background:#f8f4eb"></i><i style="background:#b45c45"></i><i style="background:#2e5f75"></i></div></button>
+      <button class="style-btn" data-style="night"><strong>Nuit urbaine</strong><span>Sombre, contrasté, net.</span><div class="swatches"><i style="background:#121820"></i><i style="background:#ef8354"></i><i style="background:#67c7d4"></i></div></button>
+      <button class="style-btn" data-style="atlas"><strong>Atlas</strong><span>Cartographique, précis.</span><div class="swatches"><i style="background:#e9ece7"></i><i style="background:#b6332e"></i><i style="background:#315c79"></i></div></button>
+      <button class="style-btn" data-style="vintage"><strong>Vintage</strong><span>Crème, doux, souvenir.</span><div class="swatches"><i style="background:#efe0c4"></i><i style="background:#8f493c"></i><i style="background:#596c58"></i></div></button>
+    </div>
+    <div class="color-row">
+      <div class="colorbox"><label>Trajet 1</label><input id="colorA" type="color" value="#b45c45"></div>
+      <div class="colorbox"><label>Trajet 2</label><input id="colorB" type="color" value="#2e5f75"></div>
+    </div>
+  </section>
+
+  <section class="section" id="offres">
+    <div class="kicker">03 · Les offres</div>
+    <h2>Du partage au souvenir.</h2>
+    <p class="lead">Une petite vidéo facile à acheter, ou une création à garder.</p>
+    <div class="products">
+      <article class="product">
+        <div class="badge">100 % numérique</div>
+        <h3>MINI</h3><div class="price">0,99 €</div>
+        <p>Une animation courte de vos deux chemins, prête à publier.</p>
+        <ul><li>Vidéo verticale</li><li>4 styles</li><li>Signature CartoKob</li></ul>
+        <button class="choose" data-product="MINI — 0,99 €">Choisir MINI</button>
+      </article>
+      <article class="product featured">
+        <div class="badge">L’affiche</div>
+        <h3>PREMIUM</h3><div class="price">49 €</div>
+        <p>Votre histoire imprimée, avec son fichier numérique HD.</p>
+        <ul><li>Affiche personnalisée</li><li>Couleurs au choix</li><li>Fichier HD</li></ul>
+        <button class="choose" data-product="PREMIUM — 49 €">Choisir PREMIUM</button>
+      </article>
+      <article class="product">
+        <div class="badge">Le récit complet</div>
+        <h3>PLATINIUM</h3><div class="price">79 €</div>
+        <p>L’affiche et une animation longue de l’exploration des routes.</p>
+        <ul><li>Affiche grand format</li><li>Vidéo premium</li><li>Sans watermark promo</li></ul>
+        <button class="choose" data-product="PLATINIUM — 79 €">Choisir PLATINIUM</button>
+      </article>
+    </div>
+
+    <div class="pay">
+      <div class="kicker">04 · Paiement</div>
+      <h2 id="selection">Choisissez une formule.</h2>
+      <p class="lead">Le paiement Apple Pay / Google Pay sera activé lors du branchement Stripe.</p>
+      <button type="button"> Pay</button>
+      <button type="button" class="gpay">G Pay</button>
+      <div class="note">Prototype : aucun paiement n’est déclenché pour l’instant.</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <strong>ICI. par CartoKob</strong><br>
+    Chaque histoire a sa géographie.
+  </footer>
+</main>
+
+<script>
+const themes={
+ epure:{bg:"#f8f4eb",road:"#c9c1b5",a:"#b45c45",b:"#2e5f75"},
+ night:{bg:"#121820",road:"#43505d",a:"#ef8354",b:"#67c7d4"},
+ atlas:{bg:"#e9ece7",road:"#aeb8af",a:"#b6332e",b:"#315c79"},
+ vintage:{bg:"#efe0c4",road:"#c6b18d",a:"#8f493c",b:"#596c58"}
+};
+const svg=document.querySelector(".map-stage svg");
+const roads=[...document.querySelectorAll("#roads path")];
+const routeA=document.getElementById("routeA");
+const routeB=document.getElementById("routeB");
+const colorA=document.getElementById("colorA");
+const colorB=document.getElementById("colorB");
+
+function applyTheme(t){
+ const th=themes[t];
+ svg.querySelector("rect").setAttribute("fill",th.bg);
+ roads.forEach(p=>p.setAttribute("stroke",th.road));
+ routeA.setAttribute("stroke",th.a); routeB.setAttribute("stroke",th.b);
+ colorA.value=th.a;colorB.value=th.b;
+ document.querySelectorAll(".style-btn").forEach(b=>b.classList.toggle("active",b.dataset.style===t));
+}
+document.querySelectorAll(".style-btn").forEach(b=>b.addEventListener("click",()=>applyTheme(b.dataset.style)));
+colorA.addEventListener("input",e=>routeA.setAttribute("stroke",e.target.value));
+colorB.addEventListener("input",e=>routeB.setAttribute("stroke",e.target.value));
+document.querySelectorAll(".choose").forEach(b=>b.addEventListener("click",()=>{
+ document.getElementById("selection").textContent=b.dataset.product;
+ document.querySelector(".pay").scrollIntoView({behavior:"smooth",block:"start"});
+}));
+</script>
+</body>
+</html>
