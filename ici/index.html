@@ -509,6 +509,7 @@ $$("[data-download]").forEach(b=>b.onclick=()=>{
 $$("[data-svg]").forEach(b=>b.onclick=()=>{
  const blob=new Blob([serializeSvg(b.dataset.svg,true)],{type:"image/svg+xml;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=b.dataset.file+"-apercu.svg";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
 });
+window.addEventListener("error",e=>{console.error("ICI.",e.error||e.message)});
 </script>
 </body>
 </html>
