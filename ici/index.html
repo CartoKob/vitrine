@@ -452,22 +452,46 @@ $("#genStory").onclick=async()=>{
  if(vals.length<3){$("#statusStory").textContent="Renseignez au moins les trois premières étapes.";return}
  const btn=$("#genStory");btn.disabled=true;
  try{
-  const pts=[];for(let i=0;i<vals.length;i++){ $("#statusStory").textContent="Recherche de l’étape "+(i+1)+"…";pts.push(await geocode(vals[i]));if(i<vals.length-1)await sleep(1100)}
-  const raw=pts.map(p=>[p.lon,p.lat]),box=bboxFromCoords(raw,.18);$("#statusStory").textContent="Dessin du territoire…";const features=await fetchFeatures(box,false);
-  const p=projector([...raw,...features.flatMap(f=>f.coords)]),th=themes[state.story.theme];
-  let s=baseSvg("NOTRE HISTOIRE",vals.length+" lieux. Une seule histoire.",th);
-  s+='<g opacity=".42">'+featureSvg(features,p,th,false)+'</g>';
-  const pp=raw.map(p.project);let d=pp.map((q,i)=>(i?"L":"M")+q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" ");
-  s+='<path d="'+d+'" fill="none" stroke="'+th.bg+'" stroke-width="8" opacity=".9"/><path d="'+d+'" fill="none" stroke="'+th.ink+'" stroke-width="1.8" stroke-dasharray="3 7" opacity=".75"/>';
+  const pts=[];
+  for(let i=0;i<vals.length;i++){
+    $("#statusStory").textContent="Recherche de l’étape "+(i+1)+"…";
+    pts.push(await geocode(vals[i]));
+    if(i<vals.length-1)await sleep(1100);
+  }
   const labels=["Notre rencontre","Premier rendez-vous","Premier chez-nous","Une étape importante","Aujourd’hui"];
-  pp.forEach((q,i)=>{
-    const col=[th.a,th.b,th.ink,th.road,th.gold||"#b89252"][i]||th.ink;
-    s+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="13" fill="'+col+'" stroke="'+th.bg+'" stroke-width="4"/><text x="'+q[0]+'" y="'+(q[1]+4)+'" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="700" fill="'+th.bg+'">'+(i+1)+'</text>';
-    s+='<text x="'+Math.min(720,q[0]+18)+'" y="'+Math.max(185,q[1]-12)+'" font-family="Georgia,serif" font-size="12" font-weight="700" fill="'+th.ink+'">'+esc(labels[i])+'</text>';
-  });
-  s+=bottomSvg("Notre histoire","Les lieux qui ont construit une vie à deux.",th,vals.length+" chapitres");
-  $("#svgStory").innerHTML=s;$("#wrapStory").classList.add("show");$("#statusStory").textContent="Carte générée.";
- }catch(e){$("#statusStory").textContent=e.message||"Impossible de générer la carte."}finally{btn.disabled=false}
+  const th=themes[state.story.theme],accents=[th.a,th.b,th.ink,th.road,"#b89252"];
+  const featureSets=[];
+  for(let i=0;i<pts.length;i++){
+    $("#statusStory").textContent="Dessin de la mini-carte "+(i+1)+"/"+pts.length+"…";
+    const P=pts[i],km=.9,latR=km/111.32,lonR=km/(111.32*Math.max(.25,Math.cos(P.lat*Math.PI/180)));
+    const box={s:P.lat-latR,w:P.lon-lonR,n:P.lat+latR,e:P.lon+lonR};
+    featureSets.push(await fetchFeatures(box,false));
+  }
+
+  let s=baseSvg("NOTRE HISTOIRE",vals.length+" chapitres cartographiés.",th);
+  s+='<defs>';
+  const layouts=vals.length<=3
+    ?[{x:46,y:184,w:708,h:176},{x:46,y:380,w:708,h:176},{x:46,y:576,w:708,h:176}]
+    :[{x:46,y:176,w:338,h:230},{x:416,y:176,w:338,h:230},{x:46,y:430,w:338,h:230},{x:416,y:430,w:338,h:230},{x:231,y:684,w:338,h:118}];
+  layouts.slice(0,vals.length).forEach((r,i)=>{s+='<clipPath id="storyClip'+(i+1)+'"><rect x="'+r.x+'" y="'+r.y+'" width="'+r.w+'" height="'+r.h+'" rx="18"/></clipPath>'});
+  s+='</defs>';
+
+  for(let i=0;i<vals.length;i++){
+    s+=storyMiniMapSvg(featureSets[i],pts[i],layouts[i],th,accents[i],labels[i],vals[i],i+1);
+  }
+
+  if(vals.length>3){
+    const centers=layouts.slice(0,vals.length).map(r=>[r.x+r.w/2,r.y+r.h/2]);
+    for(let i=0;i<centers.length-1;i++){
+      s+='<path d="M'+centers[i][0]+' '+centers[i][1]+' L'+centers[i+1][0]+' '+centers[i+1][1]+'" stroke="'+th.ink+'" stroke-width="1" stroke-dasharray="2 6" opacity=".18"/>';
+    }
+  }
+  s+=bottomSvg("Notre histoire","Chaque lieu garde sa propre carte.",th,vals.length+" chapitres");
+  $("#svgStory").innerHTML=s;
+  $("#wrapStory").classList.add("show");
+  $("#statusStory").textContent="Notre histoire générée avec "+vals.length+" mini-cartes.";
+ }catch(e){$("#statusStory").textContent=e.message||"Impossible de générer la carte."}
+ finally{btn.disabled=false}
 };
 
 function serializeSvg(id,watermark){
