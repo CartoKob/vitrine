@@ -283,21 +283,42 @@ function bboxFromCoords(coords,pad=.08){
  const dx=Math.max(e-w,.002),dy=Math.max(n-s,.002);return{s:s-dy*pad,w:w-dx*pad,n:n+dy*pad,e:e+dx*pad};
 }
 async function fetchFeatures(box,rich=false){
- const key="ici:f:"+[box.s,box.w,box.n,box.e,rich].join(":");const cached=sessionStorage.getItem(key);if(cached)return JSON.parse(cached);
- const highway=rich?"motorway|trunk|primary|secondary|tertiary|residential|unclassified|service":"motorway|trunk|primary|secondary|tertiary|residential|unclassified";
- let q='[out:json][timeout:18];('+
+ const key="ici:f2:"+[box.s,box.w,box.n,box.e,rich].map(v=>typeof v==="number"?v.toFixed(4):v).join(":");
+ const cached=sessionStorage.getItem(key);if(cached)return JSON.parse(cached);
+ const highway=rich?"motorway|trunk|primary|secondary|tertiary|residential|unclassified|service|living_street":"motorway|trunk|primary|secondary|tertiary|residential|unclassified|service";
+ let q='[out:json][timeout:20];('+
    'way["highway"~"'+highway+'"]('+box.s+','+box.w+','+box.n+','+box.e+');';
- if(rich)q+='way["waterway"]('+box.s+','+box.w+','+box.n+','+box.e+');way["natural"="water"]('+box.s+','+box.w+','+box.n+','+box.e+');way["leisure"="park"]('+box.s+','+box.w+','+box.n+','+box.e+');way["landuse"~"grass|forest|recreation_ground"]('+box.s+','+box.w+','+box.n+','+box.e+');';
+ if(rich){
+   q+='way["waterway"]('+box.s+','+box.w+','+box.n+','+box.e+');'+
+      'way["natural"="water"]('+box.s+','+box.w+','+box.n+','+box.e+');'+
+      'way["leisure"="park"]('+box.s+','+box.w+','+box.n+','+box.e+');'+
+      'way["landuse"~"grass|forest|recreation_ground|meadow"]('+box.s+','+box.w+','+box.n+','+box.e+');'+
+      'way["building"]('+box.s+','+box.w+','+box.n+','+box.e+');';
+ }
  q+=');out geom;';
- try{
-  const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});
-  if(!r.ok)return[];const j=await r.json();
-  const out=(j.elements||[]).filter(x=>x.geometry).slice(0,2400).map(x=>({
-    kind:x.tags?.highway?"road":x.tags?.waterway||x.tags?.natural==="water"?"water":"park",
-    cls:x.tags?.highway||x.tags?.waterway||x.tags?.landuse||x.tags?.leisure||"",
-    coords:x.geometry.map(g=>[g.lon,g.lat])
-  }));sessionStorage.setItem(key,JSON.stringify(out));return out;
- }catch{return[]}
+ const endpoints=[
+   "https://overpass.private.coffee/api/interpreter",
+   "https://overpass-api.de/api/interpreter",
+   "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+ ];
+ for(const endpoint of endpoints){
+  try{
+   const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),15000);
+   const r=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q),signal:ctl.signal});
+   clearTimeout(timer);if(!r.ok)continue;const j=await r.json();
+   const out=(j.elements||[]).filter(x=>x.geometry).slice(0,3600).map(x=>{
+     const tags=x.tags||{},coords=x.geometry.map(g=>[g.lon,g.lat]);
+     let kind="other";
+     if(tags.highway)kind="road";
+     else if(tags.building)kind="building";
+     else if(tags.waterway||tags.natural==="water")kind="water";
+     else if(tags.leisure==="park"||tags.landuse)kind="park";
+     return {kind,cls:tags.highway||tags.waterway||tags.landuse||tags.leisure||tags.building||"",name:tags.name||"",coords,closed:coords.length>3&&coords[0][0]===coords[coords.length-1][0]&&coords[0][1]===coords[coords.length-1][1]};
+   }).filter(x=>x.kind!=="other");
+   if(out.some(x=>x.kind==="road")){sessionStorage.setItem(key,JSON.stringify(out));return out}
+  }catch{}
+ }
+ return[];
 }
 function projector(coords,rect={x:42,y:174,w:716,h:620},pad=28){
  const merc=p=>{const lat=Math.max(-85,Math.min(85,p[1]))*Math.PI/180;return[p[0],Math.log(Math.tan(Math.PI/4+lat/2))*180/Math.PI]};
@@ -327,13 +348,31 @@ function bottomSvg(main,sub,th,right=""){
 function featureSvg(features,p,th,rich=false){
  return features.map(f=>{
   const d=p.path(f.coords);if(!d)return"";
-  if(f.kind==="water")return '<path d="'+d+'" fill="none" stroke="'+th.water+'" stroke-width="3.2" opacity=".8"/>';
-  if(f.kind==="park")return rich?'<path d="'+d+'" fill="none" stroke="'+th.park+'" stroke-width="5" opacity=".32"/>':"";
-  return '<path d="'+d+'" fill="none" stroke="'+(roadW(f.cls)<1?th.minor:th.road)+'" stroke-width="'+roadW(f.cls)+'" stroke-linecap="round" opacity="'+(roadW(f.cls)<1?.48:.72)+'"/>';
+  if(f.kind==="building")return rich&&f.closed?'<path d="'+d+' Z" fill="'+th.ink+'" fill-opacity=".075" stroke="'+th.ink+'" stroke-opacity=".10" stroke-width=".35"/>':"";
+  if(f.kind==="water")return f.closed
+    ?'<path d="'+d+' Z" fill="'+th.water+'" fill-opacity=".55" stroke="'+th.water+'" stroke-width="1.1" opacity=".9"/>'
+    :'<path d="'+d+'" fill="none" stroke="'+th.water+'" stroke-width="2.6" opacity=".85"/>';
+  if(f.kind==="park")return rich&&f.closed?'<path d="'+d+' Z" fill="'+th.park+'" fill-opacity=".32" stroke="'+th.park+'" stroke-opacity=".45" stroke-width=".7"/>':"";
+  const w=roadW(f.cls),c=w<1?th.minor:th.road;
+  return '<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="'+w+'" stroke-linecap="round" stroke-linejoin="round" opacity="'+(w<1?.5:.78)+'"/>';
  }).join("");
 }
+function roadLabelsSvg(features,p,th){
+ const seen=new Set(),candidates=features
+   .filter(f=>f.kind==="road"&&f.name&&f.coords.length>2&&/primary|secondary|tertiary|residential/.test(f.cls))
+   .sort((a,b)=>roadW(b.cls)-roadW(a.cls));
+ const out=[];
+ for(const f of candidates){
+   const key=f.name.toLowerCase();if(seen.has(key))continue;seen.add(key);
+   const mid=f.coords[Math.floor(f.coords.length/2)],q=p.project(mid);
+   if(q[0]<75||q[0]>725||q[1]<195||q[1]>785)continue;
+   out.push('<text x="'+q[0].toFixed(1)+'" y="'+q[1].toFixed(1)+'" text-anchor="middle" font-family="Georgia,serif" font-size="8.5" fill="'+th.ink+'" opacity=".44" style="paint-order:stroke;stroke:'+th.bg+';stroke-width:3px;stroke-linejoin:round">'+esc(f.name)+'</text>');
+   if(out.length>=11)break;
+ }
+ return out.join("");
+}
 
-$$(".open-product").forEach(b=>b.onclick=()=>{
+$(".open-product").forEach(b=>b.onclick=()=>{
  const key=b.dataset.open;
  $$(".product-card").forEach(c=>c.classList.toggle("active",c.dataset.product===key));
  $$(".config").forEach(c=>c.classList.remove("active"));$("#config-"+key).classList.add("active");
@@ -369,19 +408,42 @@ $("#genDate").onclick=async()=>{
  const btn=$("#genDate");btn.disabled=true;
  try{
   $("#statusDate").textContent="Recherche du lieu…";const P=await geocode(q);
-  const radius=state.date.mode==="carto"?.025:.018,box={s:P.lat-radius,w:P.lon-radius,n:P.lat+radius,e:P.lon+radius};
-  $("#statusDate").textContent="Dessin de la carte…";const features=await fetchFeatures(box,state.date.mode==="carto");
-  const all=features.flatMap(f=>f.coords);all.push([P.lon,P.lat],[P.lon-.01,P.lat-.01],[P.lon+.01,P.lat+.01]);
-  const pr=projector(all,{x:42,y:170,w:716,h:642},20),th=themes[state.date.theme],pt=pr.project([P.lon,P.lat]);
+  const km=state.date.mode==="carto"?1.55:1.25;
+  const latR=km/111.32,lonR=km/(111.32*Math.max(.25,Math.cos(P.lat*Math.PI/180)));
+  const box={s:P.lat-latR,w:P.lon-lonR,n:P.lat+latR,e:P.lon+lonR};
+  $("#statusDate").textContent="Dessin du réseau autour du lieu…";let features=await fetchFeatures(box,state.date.mode==="carto");
+  if(!features.some(f=>f.kind==="road"))throw new Error("Le réseau routier n’a pas pu être chargé. Réessayez dans quelques secondes.");
+  const bounds=[[box.w,box.s],[box.e,box.s],[box.e,box.n],[box.w,box.n]];
+  const pr=projector(bounds,{x:46,y:165,w:708,h:646},14),th=themes[state.date.theme],pt=pr.project([P.lon,P.lat]);
   let s=baseSvg("PREMIER RENDEZ-VOUS",$("#dDate").value.trim()||"Un lieu. Une date.",th);
+
   if(state.date.mode==="carto"){
-    const parks=features.filter(f=>f.kind==="park"),water=features.filter(f=>f.kind==="water"),roads=features.filter(f=>f.kind==="road");
-    s+='<g>'+featureSvg(parks,pr,th,true)+featureSvg(water,pr,th,true)+featureSvg(roads,pr,th,true)+'</g>';
-  }else s+='<g>'+featureSvg(features.filter(f=>f.kind==="road"),pr,th,false)+'</g>';
-  s+='<circle cx="'+pt[0]+'" cy="'+pt[1]+'" r="28" fill="none" stroke="'+th.a+'" stroke-width="2.2"/><circle cx="'+pt[0]+'" cy="'+pt[1]+'" r="7" fill="'+th.a+'"/>';
-  s+='<text x="'+pt[0]+'" y="'+(pt[1]+48)+'" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="'+th.ink+'">'+esc(short(q))+'</text>';
-  s+=bottomSvg($("#dNames").value.trim()||short(q),"Notre premier rendez-vous",th,P.lat.toFixed(5)+"° N · "+P.lon.toFixed(5)+"° E");
-  $("#svgDate").innerHTML=s;$("#wrapDate").classList.add("show");$("#statusDate").textContent="Carte générée.";
+    const parks=features.filter(f=>f.kind==="park");
+    const water=features.filter(f=>f.kind==="water");
+    const buildings=features.filter(f=>f.kind==="building");
+    const roads=features.filter(f=>f.kind==="road");
+    s+='<g>'+featureSvg(parks,pr,th,true)+featureSvg(water,pr,th,true)+featureSvg(buildings,pr,th,true)+'</g>';
+    s+='<g>'+featureSvg(roads,pr,th,true)+'</g>';
+    s+='<g>'+roadLabelsSvg(roads,pr,th)+'</g>';
+  }else{
+    const roads=features.filter(f=>f.kind==="road");
+    s+='<g>'+featureSvg(roads,pr,th,false)+'</g>';
+  }
+
+  s+='<circle cx="'+pt[0]+'" cy="'+pt[1]+'" r="34" fill="'+th.bg+'" fill-opacity=".72" stroke="'+th.a+'" stroke-width="2.2"/>'+
+     '<circle cx="'+pt[0]+'" cy="'+pt[1]+'" r="7.5" fill="'+th.a+'"/>'+
+     '<circle cx="'+pt[0]+'" cy="'+pt[1]+'" r="13" fill="none" stroke="'+th.a+'" stroke-width=".8" opacity=".5"/>';
+
+  const placeLabel=short(q).toUpperCase();
+  s+='<rect x="'+(pt[0]-95)+'" y="'+(pt[1]+47)+'" width="190" height="26" rx="13" fill="'+th.bg+'" fill-opacity=".88"/>'+
+     '<text x="'+pt[0]+'" y="'+(pt[1]+65)+'" text-anchor="middle" font-family="Georgia,serif" font-size="11" font-weight="700" letter-spacing=".8" fill="'+th.ink+'">'+esc(placeLabel)+'</text>';
+
+  const names=$("#dNames").value.trim();
+  const bottomMain=names||short(q);
+  const bottomSub=names?short(q)+" · Notre premier rendez-vous":"Notre premier rendez-vous";
+  s+=bottomSvg(bottomMain,bottomSub,th,P.lat.toFixed(5)+"° N · "+P.lon.toFixed(5)+"° E");
+  $("#svgDate").innerHTML=s;$("#wrapDate").classList.add("show");
+  $("#statusDate").textContent=(state.date.mode==="carto"?"Carto détaillée":"Réseau stylisé")+" généré · "+features.filter(f=>f.kind==="road").length+" rues.";
  }catch(e){$("#statusDate").textContent=e.message||"Impossible de générer la carte."}finally{btn.disabled=false}
 };
 
