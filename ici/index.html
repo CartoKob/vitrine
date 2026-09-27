@@ -32,7 +32,12 @@ h1{font-size:clamp(54px,17vw,82px);line-height:.86;letter-spacing:-.06em;margin:
 .field label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.field input{width:100%;border:0;outline:0;background:transparent;font-size:18px;color:var(--ink)}
 .actionbox{margin-top:14px}.status{min-height:22px;font-size:13px;color:var(--muted);margin:10px 3px 0}
 #result{display:none;margin-top:26px}
-.result-card{border:1px solid var(--line);border-radius:26px;overflow:hidden;background:#fff8;box-shadow:var(--shadow)}
+.result-card{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff8;box-shadow:none;margin-top:12px}
+.route-details{margin-top:22px;border-top:1px solid var(--line);padding-top:14px}
+.route-details summary{cursor:pointer;font-size:15px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:7px 2px}
+.route-details summary::-webkit-details-marker{display:none}
+.route-details summary:after{content:"＋";font-size:20px;font-weight:400}
+.route-details[open] summary:after{content:"−"}
 .map-wrap{position:relative}
 #map{height:60vh;min-height:455px;max-height:640px;background:#ddd}
 .map-brand{position:absolute;left:14px;top:14px;z-index:500;background:rgba(244,239,229,.88);backdrop-filter:blur(10px);border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:8px 11px;font-size:12px;font-weight:700;letter-spacing:.03em}
@@ -42,8 +47,8 @@ h1{font-size:clamp(54px,17vw,82px);line-height:.86;letter-spacing:-.06em;margin:
 .map-theme-night .leaflet-tile{filter:grayscale(.35) invert(.92) hue-rotate(175deg) saturate(.55) brightness(.58) contrast(1.08)}
 .map-theme-atlas .leaflet-tile{filter:saturate(.72) contrast(.96) brightness(1.02)}
 .result-meta{padding:16px 16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{border:1px solid var(--line);border-radius:15px;padding:12px;background:rgba(255,255,255,.24)}.metric span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.metric strong{font-size:21px}
-.poster-label{display:flex;justify-content:space-between;align-items:end;margin:24px 2px 10px}.poster-label strong{font-size:21px}.poster-label span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-.poster{border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}.poster svg{width:100%;display:block}.poster-actions{padding:12px;display:grid;grid-template-columns:1fr;gap:8px}.secondary{width:100%;border:1px solid var(--ink);background:transparent;border-radius:999px;padding:14px;font-weight:700}.secondary.dark{background:var(--ink);color:#fff}.download-help{text-align:center;font-size:11px;color:var(--muted);padding:0 14px 14px}
+.poster-label{display:flex;justify-content:space-between;align-items:end;margin:8px 2px 12px}.poster-label strong{font-size:21px}.poster-label span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.poster{border:1px solid rgba(23,23,23,.12);border-radius:4px;overflow:hidden;background:#fff;box-shadow:0 28px 80px rgba(23,23,23,.16)}.poster svg{width:100%;display:block}.poster-actions{padding:12px;display:grid;grid-template-columns:1fr;gap:8px}.secondary{width:100%;border:1px solid var(--ink);background:transparent;border-radius:999px;padding:14px;font-weight:700}.secondary.dark{background:var(--ink);color:#fff}.download-help{text-align:center;font-size:11px;color:var(--muted);padding:0 14px 14px}
 .style-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.style-btn{min-height:112px;text-align:left;border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(255,255,255,.18);transition:.18s}.style-btn:active{transform:scale(.985)}.style-btn.active{border:2px solid var(--ink);padding:13px;background:rgba(255,255,255,.45)}.style-btn strong{display:block;font-size:18px;margin-bottom:4px}.style-btn span{font-size:12px;color:var(--muted)}
 .swatches{display:flex;gap:7px;margin-top:14px}.swatches i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}.color-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.colorbox{border:1px solid var(--line);border-radius:18px;padding:12px;background:rgba(255,255,255,.2)}.colorbox label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.colorbox input{width:100%;height:38px;border:0;background:none;padding:0;margin-top:4px}
 .products{display:grid;gap:12px}.product{border:1px solid var(--line);border-radius:22px;padding:20px;background:rgba(255,255,255,.24)}.product.featured{background:var(--ink);color:#fff;border-color:var(--ink)}.badge{display:inline-block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;border-radius:999px;padding:5px 8px;margin-bottom:14px;opacity:.8}.product h3{font-size:27px;margin:0}.price{font-size:36px;font-weight:700;margin:8px 0}.product p{color:var(--muted);line-height:1.42}.product.featured p{color:#d6d2ca}.product ul{padding-left:18px;line-height:1.55;font-size:14px}.choose{margin-top:16px;width:100%;padding:14px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font-weight:700}.featured .choose{background:#fff;color:var(--ink);border-color:#fff}
@@ -78,42 +83,50 @@ h1{font-size:clamp(54px,17vw,82px);line-height:.86;letter-spacing:-.06em;margin:
   </div>
 
   <div id="result">
-    <div class="result-card">
-      <div class="map-wrap">
-        <div class="map-brand">ICI. · CartoKob</div>
-        <div id="map"></div>
-      </div>
-      <div class="result-meta">
-        <div class="metric"><span>Premier chemin</span><strong id="distA">—</strong></div>
-        <div class="metric"><span>Deuxième chemin</span><strong id="distB">—</strong></div>
-      </div>
-    </div>
-
     <div class="poster-label"><strong>Votre affiche</strong><span>Aperçu gratuit</span></div>
     <div class="poster">
       <svg id="posterSvg" viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg" aria-label="Affiche personnalisée ICI.">
+        <defs>
+          <clipPath id="mapClip"><rect x="42" y="164" width="716" height="650"/></clipPath>
+        </defs>
         <rect id="posterBg" width="800" height="1000" fill="#f8f4eb"/>
-        <g id="posterRoads" opacity=".42"></g>
-        <text id="posterLogo" x="54" y="76" font-family="Georgia,serif" font-size="36" font-weight="700" fill="#171717">ICI.</text>
-        <text id="posterTitle" x="54" y="119" font-family="Georgia,serif" font-size="20" fill="#171717">Deux chemins. Une rencontre.</text>
-        <line id="posterRule" x1="54" y1="145" x2="746" y2="145" stroke="#171717" stroke-width="1" opacity=".25"/>
-        <g id="posterRoutes"></g>
-        <g id="posterPoints"></g>
-        <g id="posterLabels"></g>
-        <text id="posterMeetLabel" x="400" y="888" text-anchor="middle" font-family="Georgia,serif" font-size="25" font-weight="700" fill="#171717">Notre rencontre</text>
-        <text id="posterSubLabel" x="400" y="920" text-anchor="middle" font-family="Georgia,serif" font-size="14" fill="#6e6a63">L’endroit où tout a commencé.</text>
-        <g id="posterWatermark" opacity=".11" transform="rotate(-28 400 500)">
-          <text x="400" y="465" text-anchor="middle" font-family="Georgia,serif" font-size="74" font-weight="700" letter-spacing="8" fill="#171717">CARTOKOB</text>
-          <text x="400" y="535" text-anchor="middle" font-family="Georgia,serif" font-size="74" font-weight="700" letter-spacing="8" fill="#171717">CARTOKOB</text>
+        <text id="posterEyebrow" x="48" y="48" font-family="Georgia,serif" font-size="11" letter-spacing="3" fill="#6e6a63">CARTE DE RENCONTRE · CARTOKOB</text>
+        <text id="posterLogo" x="46" y="112" font-family="Georgia,serif" font-size="58" font-weight="700" letter-spacing="-3" fill="#171717">ICI.</text>
+        <text id="posterTitle" x="754" y="105" text-anchor="end" font-family="Georgia,serif" font-size="17" fill="#171717">Deux chemins. Une rencontre.</text>
+        <line id="posterRule" x1="46" y1="139" x2="754" y2="139" stroke="#171717" stroke-width="1" opacity=".28"/>
+        <g clip-path="url(#mapClip)">
+          <g id="posterRoads" opacity=".36"></g>
+          <g id="posterRoutes"></g>
+          <g id="posterPoints"></g>
+          <g id="posterLabels"></g>
         </g>
-        <text id="posterCredit" x="400" y="964" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#6e6a63">ICI. par CartoKob · © OpenStreetMap contributors</text>
+        <line id="posterBottomRule" x1="46" y1="839" x2="754" y2="839" stroke="#171717" stroke-width="1" opacity=".20"/>
+        <text id="posterMeetLabel" x="46" y="892" font-family="Georgia,serif" font-size="31" font-weight="700" fill="#171717">Notre rencontre</text>
+        <text id="posterSubLabel" x="46" y="923" font-family="Georgia,serif" font-size="14" fill="#6e6a63">L’endroit où tout a commencé.</text>
+        <text id="posterCoords" x="754" y="892" text-anchor="end" font-family="Georgia,serif" font-size="12" fill="#6e6a63">—</text>
+        <text id="posterCredit" x="754" y="924" text-anchor="end" font-family="Georgia,serif" font-size="11" fill="#6e6a63">© OpenStreetMap contributors</text>
+        <text id="posterSignature" x="46" y="968" font-family="Georgia,serif" font-size="13" font-weight="700" fill="#171717">ICI. par CartoKob</text>
       </svg>
       <div class="poster-actions">
-        <button class="secondary dark" id="downloadSd">Télécharger en SD</button>
-        <button class="secondary" id="downloadSvg">Télécharger le SVG aperçu</button>
+        <button class="secondary dark" id="downloadSd">Télécharger l’aperçu SD</button>
+        <button class="secondary" id="downloadSvg">SVG aperçu</button>
       </div>
-      <div class="download-help">Version SD gratuite : 1080 × 1350 px avec filigrane CartoKob. Les offres payantes débloqueront les exports premium.</div>
+      <div class="download-help">L’aperçu écran reste propre. Le fichier gratuit téléchargé reçoit un filigrane CartoKob.</div>
     </div>
+
+    <details class="route-details">
+      <summary>Voir la carte et le détail des trajets</summary>
+      <div class="result-card">
+        <div class="map-wrap">
+          <div class="map-brand">ICI. · CartoKob</div>
+          <div id="map"></div>
+        </div>
+        <div class="result-meta">
+          <div class="metric"><span>Premier chemin</span><strong id="distA">—</strong></div>
+          <div class="metric"><span>Deuxième chemin</span><strong id="distB">—</strong></div>
+        </div>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -259,13 +272,24 @@ function renderLeaflet(data){
 }
 
 function projectRoutes(data){
-  const all=[...data.routeA.geometry.coordinates,...data.routeB.geometry.coordinates,[data.A.lon,data.A.lat],[data.B.lon,data.B.lat],[data.M.lon,data.M.lat]];
-  const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
-  let minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const dx=Math.max(maxX-minX,.001),dy=Math.max(maxY-minY,.001);
-  const pad=.08;minX-=dx*pad;maxX+=dx*pad;minY-=dy*pad;maxY+=dy*pad;
-  const W=692,H=650,OX=54,OY=172;
-  const proj=p=>[OX+(p[0]-minX)/(maxX-minX)*W,OY+H-(p[1]-minY)/(maxY-minY)*H];
+  const merc=p=>{
+    const lon=p[0],lat=Math.max(-85,Math.min(85,p[1]))*Math.PI/180;
+    return [lon,Math.log(Math.tan(Math.PI/4+lat/2))*180/Math.PI];
+  };
+  const raw=[...data.routeA.geometry.coordinates,...data.routeB.geometry.coordinates,
+    [data.A.lon,data.A.lat],[data.B.lon,data.B.lat],[data.M.lon,data.M.lat]].map(merc);
+  const xs=raw.map(p=>p[0]),ys=raw.map(p=>p[1]);
+  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+  const mapX=42,mapY=164,mapW=716,mapH=650,pad=34;
+  const sx=(mapW-pad*2)/Math.max(maxX-minX,.00001);
+  const sy=(mapH-pad*2)/Math.max(maxY-minY,.00001);
+  const scale=Math.min(sx,sy);
+  const usedW=(maxX-minX)*scale,usedH=(maxY-minY)*scale;
+  const ox=mapX+(mapW-usedW)/2, oy=mapY+(mapH-usedH)/2;
+  const proj=p=>{
+    const m=merc(p);
+    return [ox+(m[0]-minX)*scale, oy+usedH-(m[1]-minY)*scale];
+  };
   const path=coords=>coords.map((p,i)=>{const q=proj(p);return (i?"L":"M")+q[0].toFixed(1)+" "+q[1].toFixed(1)}).join(" ");
   return {path,A:proj([data.A.lon,data.A.lat]),B:proj([data.B.lon,data.B.lat]),M:proj([data.M.lon,data.M.lat])};
 }
@@ -282,26 +306,34 @@ function roadWeight(cls){
 function renderPoster(data){
   const th=themes[currentTheme],g=projectRoutes(data);
   $("#posterBg").setAttribute("fill",th.bg);
-  ["posterLogo","posterTitle","posterMeetLabel"].forEach(id=>$("#"+id).setAttribute("fill",th.ink));
+  ["posterLogo","posterTitle","posterMeetLabel","posterSignature"].forEach(id=>$("#"+id).setAttribute("fill",th.ink));
   $("#posterRule").setAttribute("stroke",th.ink);
-  $("#posterWatermark").querySelectorAll("text").forEach(t=>t.setAttribute("fill",th.ink));
+  $("#posterBottomRule").setAttribute("stroke",th.ink);
+  const roadOpacity=currentTheme==="night"?.26:currentTheme==="vintage"?.40:.34;
+  $("#posterRoads").setAttribute("opacity",roadOpacity);
   $("#posterRoads").innerHTML=(data.roads||[]).map(r=>{
     const d=g.path(r.coords);if(!d)return "";
     return '<path d="'+d+'" fill="none" stroke="'+th.road+'" stroke-width="'+roadWeight(r.cls)+'" stroke-linecap="round" stroke-linejoin="round"/>';
   }).join("");
+  const halo=currentTheme==="night"?th.bg:"#fffdf7";
   $("#posterRoutes").innerHTML=
-    '<path d="'+g.path(data.routeA.geometry.coordinates)+'" fill="none" stroke="'+th.bg+'" stroke-width="12" opacity=".8" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '<path d="'+g.path(data.routeB.geometry.coordinates)+'" fill="none" stroke="'+th.bg+'" stroke-width="12" opacity=".8" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '<path d="'+g.path(data.routeA.geometry.coordinates)+'" fill="none" stroke="'+th.a+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '<path d="'+g.path(data.routeB.geometry.coordinates)+'" fill="none" stroke="'+th.b+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>';
+    '<path d="'+g.path(data.routeA.geometry.coordinates)+'" fill="none" stroke="'+halo+'" stroke-width="13" opacity=".72" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<path d="'+g.path(data.routeB.geometry.coordinates)+'" fill="none" stroke="'+halo+'" stroke-width="13" opacity=".72" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<path d="'+g.path(data.routeA.geometry.coordinates)+'" fill="none" stroke="'+th.a+'" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<path d="'+g.path(data.routeB.geometry.coordinates)+'" fill="none" stroke="'+th.b+'" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>';
   $("#posterPoints").innerHTML=
-    '<circle cx="'+g.A[0]+'" cy="'+g.A[1]+'" r="12" fill="'+th.a+'" stroke="'+th.bg+'" stroke-width="4"/>'+
-    '<circle cx="'+g.B[0]+'" cy="'+g.B[1]+'" r="12" fill="'+th.b+'" stroke="'+th.bg+'" stroke-width="4"/>'+
-    '<circle cx="'+g.M[0]+'" cy="'+g.M[1]+'" r="17" fill="'+th.bg+'" stroke="'+th.ink+'" stroke-width="5"/>';
+    '<circle cx="'+g.A[0]+'" cy="'+g.A[1]+'" r="10" fill="'+th.bg+'" stroke="'+th.a+'" stroke-width="5"/>'+
+    '<circle cx="'+g.B[0]+'" cy="'+g.B[1]+'" r="10" fill="'+th.bg+'" stroke="'+th.b+'" stroke-width="5"/>'+
+    '<circle cx="'+g.M[0]+'" cy="'+g.M[1]+'" r="16" fill="'+th.bg+'" stroke="'+th.ink+'" stroke-width="5"/>'+
+    '<circle cx="'+g.M[0]+'" cy="'+g.M[1]+'" r="4.5" fill="'+th.ink+'"/>';
+  const labelA=escapeXml(shortLabel($("#placeA").value)), labelB=escapeXml(shortLabel($("#placeB").value));
+  const ax=Math.min(700,Math.max(60,g.A[0]+14)), ay=Math.max(184,g.A[1]-14);
+  const bx=Math.min(700,Math.max(60,g.B[0]+14)), by=Math.max(184,g.B[1]-14);
   $("#posterLabels").innerHTML=
-    '<text x="'+(g.A[0]+14)+'" y="'+(g.A[1]-14)+'" font-family="Georgia,serif" font-size="13" font-weight="700" fill="'+th.ink+'">'+escapeXml(shortLabel($("#placeA").value))+'</text>'+
-    '<text x="'+(g.B[0]+14)+'" y="'+(g.B[1]-14)+'" font-family="Georgia,serif" font-size="13" font-weight="700" fill="'+th.ink+'">'+escapeXml(shortLabel($("#placeB").value))+'</text>';
+    '<text x="'+ax+'" y="'+ay+'" font-family="Georgia,serif" font-size="13" font-weight="700" fill="'+th.ink+'">'+labelA+'</text>'+
+    '<text x="'+bx+'" y="'+by+'" font-family="Georgia,serif" font-size="13" font-weight="700" fill="'+th.ink+'">'+labelB+'</text>';
   $("#posterMeetLabel").textContent=shortLabel($("#placeM").value)||"Notre rencontre";
+  $("#posterCoords").textContent=data.M.lat.toFixed(5)+"° N · "+data.M.lon.toFixed(5)+"° E";
 }
 function escapeXml(s){return s.replace(/[<>&'"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","'":"&apos;",'"':"&quot;"}[c]))}
 
@@ -313,6 +345,9 @@ function applyTheme(name){
   if(lastData){renderLeaflet(lastData);renderPoster(lastData)}
 }
 document.querySelectorAll(".style-btn").forEach(b=>b.addEventListener("click",()=>applyTheme(b.dataset.style)));
+document.querySelector(".route-details")?.addEventListener("toggle",e=>{
+  if(e.currentTarget.open&&map)setTimeout(()=>map.invalidateSize(),80);
+});
 $("#colorA").addEventListener("input",e=>{themes[currentTheme].a=e.target.value;if(lastData){renderLeaflet(lastData);renderPoster(lastData)}});
 $("#colorB").addEventListener("input",e=>{themes[currentTheme].b=e.target.value;if(lastData){renderLeaflet(lastData);renderPoster(lastData)}});
 
@@ -341,9 +376,23 @@ $("#generate").addEventListener("click",async()=>{
   finally{btn.disabled=false}
 });
 
-function serializePoster(){
+function serializePoster(withWatermark=true){
   const svg=$("#posterSvg").cloneNode(true);
   svg.setAttribute("xmlns","http://www.w3.org/2000/svg");
+  if(withWatermark){
+    const ns="http://www.w3.org/2000/svg";
+    const g=document.createElementNS(ns,"g");
+    g.setAttribute("opacity",".10");
+    g.setAttribute("transform","rotate(-28 400 500)");
+    for(const y of [440,520,600]){
+      const t=document.createElementNS(ns,"text");
+      t.setAttribute("x","400");t.setAttribute("y",String(y));t.setAttribute("text-anchor","middle");
+      t.setAttribute("font-family","Georgia,serif");t.setAttribute("font-size","64");t.setAttribute("font-weight","700");
+      t.setAttribute("letter-spacing","7");t.setAttribute("fill",themes[currentTheme].ink);t.textContent="CARTOKOB";
+      g.appendChild(t);
+    }
+    svg.appendChild(g);
+  }
   return new XMLSerializer().serializeToString(svg);
 }
 $("#downloadSvg").addEventListener("click",()=>{
